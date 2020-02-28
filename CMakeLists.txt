@@ -1,3 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(baller)
+
 # specify which version and components you need
 find_package(OGRE 1.12 REQUIRED COMPONENTS Bites RTShaderSystem)
 

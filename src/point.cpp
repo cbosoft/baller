@@ -53,3 +53,21 @@ void Point::generate_anim()
     key_frame->setTranslate(dposition);
   }
 }
+
+
+void Point::apply(double t)
+{
+  //this->track->apply(Ogre::TimeIndex(t));
+  static unsigned int i = 1;
+  static double toff = 0.0;
+  if (i >= this->positions.size()) {
+    i = 1; // restart, or end? TODO
+    toff += this->times.back();
+  }
+  double tprime = t-toff;
+
+  Ogre::Vector3 velocity = (this->get_position(i) - this->get_position(i-1)) / (this->get_time(i) - this->get_time(i-1));
+  double dt = tprime - this->get_time(i);
+  this->node->setPosition(this->get_position(i) + (velocity*dt));
+  if (tprime > this->get_time(i)) i++;
+}

@@ -22,5 +22,6 @@ class Point {
 
     Ogre::SceneNode *get_node() const;
     void generate_anim();
+    void apply(double t);
 
 };

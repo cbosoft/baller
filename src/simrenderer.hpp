@@ -44,6 +44,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
 
     std::list<double> fps_history;
     int fps_history_max_len;
+    std::string trajectory_path;
     void setup();
     bool keyPressed(const OgreBites::KeyboardEvent& evt);
     bool keyReleased(const OgreBites::KeyboardEvent& evt);
@@ -59,16 +60,20 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     void reset_camera();
 
   public:
-    Renderer(double camera_distance, double rotation_speed, double pan_speed, double zoom_mult) : OgreBites::ApplicationContext("renderer")
+    Renderer(std::string trajectory_path, double camera_distance, double rotation_speed, double pan_speed, double zoom_mult) : OgreBites::ApplicationContext("renderer")
     {
-      this->mouse_camera_control = false;
-      this->keys_down = 0;
-      this->time = 0.0;
-
+      this->trajectory_path = trajectory_path;
       this->cam_dist = camera_distance;
       this->rot_speed = rotation_speed;
       this->pan_speed = pan_speed;
       this->zoom_mult = zoom_mult;
+
+      this->mouse_camera_control = false;
+      this->keys_down = 0;
+      this->time = 0.0;
+      this->fps_history_max_len = 100;
+      this->overlay_frames_skip = 10;
+      this->time_mult = 0.1;
     };
     virtual ~Renderer() {}
 

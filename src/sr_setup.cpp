@@ -42,9 +42,10 @@ void Renderer::setup()
 
   this->getRenderWindow()->addViewport(cam);
 
+  this->load_trajectory();
 
 
 
-
+  this->init_overlay();
 
 }

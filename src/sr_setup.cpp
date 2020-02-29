@@ -14,19 +14,19 @@ void Renderer::setup()
     Ogre::RTShader::ShaderGenerator::getSingletonPtr();
   shadergen->addSceneManager(scene_manager);
 
-  scene_manager->setAmbientLight(Ogre::ColourValue(1.0, 1.0, 1.0));
+  scene_manager->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1));
 
-  // Ogre::Light* top_light = scene_manager->createLight("topLight");
-  // Ogre::SceneNode* topLightNode = scene_manager->getRootSceneNode()->createChildSceneNode("topLightNode");
-  // topLightNode->attachObject(top_light);
-  // top_light->setDiffuseColour(1.0, 0.5, 0.5);
-  // topLightNode->setPosition(0, 100, 0);
+  Ogre::Light* top_light = scene_manager->createLight("topLight");
+  Ogre::SceneNode* topLightNode = scene_manager->getRootSceneNode()->createChildSceneNode("topLightNode");
+  topLightNode->attachObject(top_light);
+  top_light->setDiffuseColour(1.0, 0.5, 0.5);
+  topLightNode->setPosition(0, 100, 0);
 
-  // Ogre::Light* bottom_light = scene_manager->createLight("bottomLight");
-  // Ogre::SceneNode* bottomLightNode = scene_manager->getRootSceneNode()->createChildSceneNode("bottomLightNode");
-  // bottomLightNode->attachObject(bottom_light);
-  // bottom_light->setDiffuseColour(0.5, 0.5, 1.0);
-  // bottomLightNode->setPosition(0, -100, 0);
+  Ogre::Light* bottom_light = scene_manager->createLight("bottomLight");
+  Ogre::SceneNode* bottomLightNode = scene_manager->getRootSceneNode()->createChildSceneNode("bottomLightNode");
+  bottomLightNode->attachObject(bottom_light);
+  bottom_light->setDiffuseColour(0.5, 0.5, 1.0);
+  bottomLightNode->setPosition(0, -100, 0);
 
   Ogre::SceneNode* camNode = scene_manager->getRootSceneNode()->createChildSceneNode("cameraNode");
   Ogre::SceneNode* origNode = scene_manager->getRootSceneNode()->createChildSceneNode("originNode");

@@ -42,6 +42,8 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
 
     int keys_down;
 
+    std::list<double> fps_history;
+    int fps_history_max_len;
     void setup();
     bool keyPressed(const OgreBites::KeyboardEvent& evt);
     bool keyReleased(const OgreBites::KeyboardEvent& evt);
@@ -71,4 +73,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     virtual ~Renderer() {}
 
     void load_trajectory(std::string path);
+
+    double add_fps_get_av(double fps);
+
 };

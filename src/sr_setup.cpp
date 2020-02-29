@@ -42,20 +42,6 @@ void Renderer::setup()
 
   this->getRenderWindow()->addViewport(cam);
 
-  scene_manager->createAnimation("anim", 100.0 /* TODO: replace with actual time unit length of trajectory*/);
-
-  // add points here
-  Ogre::Vector3 r(0.0, 0.0, 1.0);
-  Point p = Point(this, r, 1.0);
-  p.add_timepoint(r*1.1, 100.0);
-  p.generate_anim();
-  this->points.push_back(p);
-
-  r = Ogre::Vector3(1.0, 0.0, 0.0);
-  p = Point(this, r, 1.0);
-  p.add_timepoint(r*1.1, 100.0);
-  p.generate_anim();
-  this->points.push_back(p);
 
 
 

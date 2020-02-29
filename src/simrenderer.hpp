@@ -1,11 +1,14 @@
 #pragma once
 
+#include <iostream>
+#include <cmath>
+
 #include "Ogre.h"
 #include "OgreApplicationContext.h"
 #include "OgreInput.h"
 #include "OgreRTShaderSystem.h"
-#include <iostream>
-#include <cmath>
+
+#include "point.hpp"
 
 enum DIR_KEYS {
   DK_L = 1 << 0,
@@ -34,7 +37,8 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     double rot_speed;
     double pan_speed;
     double zoom_mult;
-    std::list<Ogre::SceneNode *> point_nodes;
+    double time;
+    std::list<Point> points;
 
     int keys_down;
 
@@ -45,6 +49,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     bool mouseWheelRolled(const OgreBites::MouseWheelEvent &evt);
     bool mousePressed(const OgreBites::MouseButtonEvent &evt);
     bool mouseReleased(const OgreBites::MouseButtonEvent &evt);
+    bool frameEnded(const Ogre::FrameEvent &evt);
 
     void rotate_camera(double dyaw, double dpitch, double droll);
     void move_camera(double dx, double dy, double dz);
@@ -56,6 +61,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     {
       this->mouse_camera_control = false;
       this->keys_down = 0;
+      this->time = 0.0;
 
       this->cam_dist = camera_distance;
       this->rot_speed = rotation_speed;

@@ -1,4 +1,9 @@
+#include <sstream>
+
 #include "simrenderer.hpp"
+#include "textrenderer.hpp"
+
+
 double Renderer::add_fps_get_av(double fps)
 {
   this->fps_history.push_back(fps);
@@ -15,10 +20,25 @@ double Renderer::add_fps_get_av(double fps)
 
 bool Renderer::frameEnded(const Ogre::FrameEvent &evt)
 {
-  this->time += evt.timeSinceLastFrame;
-  auto scene_manager = this->getRoot()->getSceneManager("mainSceneManager");
-  auto anim = scene_manager->getAnimation("anim");
-  anim->apply(this->time);
-  std::cerr << this->time << std::endl;
+  this->time += this->time_mult*evt.timeSinceLastFrame;
+  for (auto point : this->points) {
+    point.apply(this->time);
+  }
+
+  double fps = this->add_fps_get_av(1.0/evt.timeSinceLastFrame);
+
+  static int i = 0;
+
+  if (i > this->overlay_frames_skip) {
+    std::stringstream ss;
+    ss
+      << " some stats " << std::endl
+      << "fps: " << fps << std::endl 
+      << "  t: " << this->time;
+    TextRenderer::getSingleton().setText("disp", ss.str());
+    i = 0;
+  }
+
+  i++;
   return true;
 }

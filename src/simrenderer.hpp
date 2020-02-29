@@ -2,13 +2,16 @@
 
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 #include "Ogre.h"
 #include "OgreApplicationContext.h"
+#include "OgreOverlaySystem.h"
 #include "OgreInput.h"
 #include "OgreRTShaderSystem.h"
 
 #include "point.hpp"
+#include "textrenderer.hpp"
 
 enum DIR_KEYS {
   DK_L = 1 << 0,
@@ -37,14 +40,21 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     double rot_speed;
     double pan_speed;
     double zoom_mult;
+    double time_mult;
     double time;
-    std::list<Point> points;
 
     int keys_down;
 
+    TextRenderer *tr;
+
     std::list<double> fps_history;
     int fps_history_max_len;
+    int overlay_frames_skip;
+
     std::string trajectory_path;
+    std::vector<Point> points;
+
+
     void setup();
     bool keyPressed(const OgreBites::KeyboardEvent& evt);
     bool keyReleased(const OgreBites::KeyboardEvent& evt);
@@ -53,6 +63,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     bool mousePressed(const OgreBites::MouseButtonEvent &evt);
     bool mouseReleased(const OgreBites::MouseButtonEvent &evt);
     bool frameEnded(const Ogre::FrameEvent &evt);
+    void load_trajectory();
 
     void rotate_camera(double dyaw, double dpitch, double droll);
     void move_camera(double dx, double dy, double dz);
@@ -75,9 +86,20 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
       this->overlay_frames_skip = 10;
       this->time_mult = 0.1;
     };
-    virtual ~Renderer() {}
 
-    void load_trajectory(std::string path);
+    void init_overlay() {
+      auto root = Ogre::Root::getSingletonPtr();
+      auto scene_manager = root->getSceneManager("mainSceneManager");
+      scene_manager->addRenderQueueListener(this->getOverlaySystem());
+
+      this->tr = new TextRenderer();
+      this->tr->addTextBox("disp", " ", 10, 10, 100, 100, Ogre::ColourValue::Green);
+    }
+
+    virtual ~Renderer() {
+      if (this->tr) 
+        delete this->tr;
+    }
 
     double add_fps_get_av(double fps);
 

@@ -11,11 +11,13 @@ file(COPY ${OGRE_CONFIG_DIR}/resources.cfg DESTINATION ${CMAKE_CURRENT_BINARY_DI
 # add the source files as usual
 add_executable(baller 
   src/main.cpp 
-  src/simrenderer_input.cpp
   src/maths_util.cpp
-  src/simrenderer.cpp
-  src/simrenderer_camera.cpp 
-  src/simrenderer_setup.cpp)
+  src/point.cpp
+  src/sr.cpp
+  src/sr_anim.cpp
+  src/sr_input.cpp
+  src/sr_camera.cpp 
+  src/sr_setup.cpp)
 
 # this also sets the includes and pulls third party dependencies
 target_link_libraries(baller OgreBites OgreRTShaderSystem)

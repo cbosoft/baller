@@ -1,12 +1,18 @@
 #include "simrenderer.hpp"
+#include "textrenderer.hpp"
 
-int main(void) //int argc, char **argv)
+int main(int argc, char **argv)
 {
+  std::string trajectory = "traj.yaml";
+  argc --; argv++;
+  if (argc > 0) {
+    trajectory = argv[0];
+  }
+
   try
   {
-  	Renderer app(10, 0.01, 10.0, 10.0);
+  	Renderer app(trajectory, 10, 0.01, 10.0, 10.0);
     app.initApp();
-    //app.readTrajectory(); // TODO
     app.getRoot()->startRendering();
     app.closeApp();
   }

@@ -21,7 +21,6 @@ class Point {
     double get_time(int timestep) const;
 
     Ogre::SceneNode *get_node() const;
-    void generate_anim();
     void apply(double t);
 
 };

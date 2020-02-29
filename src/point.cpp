@@ -41,20 +41,6 @@ Ogre::SceneNode *Point::get_node() const
   return this->node;
 }
 
-void Point::generate_anim() 
-{
-  auto scene_manager = this->ctxt->getRoot()->getSceneManager("mainSceneManager");
-  auto anim = scene_manager->getAnimation("anim");
-  auto track = anim->createNodeTrack(handlec++, this->node);
-  for (unsigned int i = 1; i < this->positions.size(); i++) {
-    auto time = this->get_time(i);
-    auto dposition = this->get_position(i) - this->get_position(i-1);;
-    auto key_frame = track->createNodeKeyFrame(time);
-    key_frame->setTranslate(dposition);
-  }
-}
-
-
 void Point::apply(double t)
 {
   //this->track->apply(Ogre::TimeIndex(t));

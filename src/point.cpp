@@ -16,8 +16,8 @@ Point::Point(OgreBites::ApplicationContext *ctxt, Ogre::Vector3 position, double
   this->node = scene_manager->getRootSceneNode()->createChildSceneNode();
   this->node->attachObject(ballEntity);
   this->node->setPosition(position);
-  this->node->setScale(r/200.0, r/200.0, r/200.0);
-  std::cerr << this->node->getPosition() << r/200.0 << std::endl;
+  this->node->setScale(r/100.0, r/100.0, r/100.0);
+  std::cerr << this->node->getPosition() << r/100.0 << std::endl;
 }
 
 void Point::add_timepoint(Ogre::Vector3 position, double time)

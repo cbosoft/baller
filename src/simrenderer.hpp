@@ -37,8 +37,8 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
   private:
     bool mouse_camera_control;
     double cam_dist;
-    double rot_speed;
-    double pan_speed;
+    double cam_dist_default;
+    double orbit_speed;
     double zoom_mult;
     double time_mult;
     double time;
@@ -65,18 +65,16 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     bool frameEnded(const Ogre::FrameEvent &evt);
     void load_trajectory();
 
-    void rotate_camera(double dyaw, double dpitch, double droll);
-    void move_camera(double dx, double dy, double dz);
-    void look_at_origin();
+    void orbit_camera(double dx, double dy, double dz);
     void reset_camera();
 
   public:
-    Renderer(std::string trajectory_path, double camera_distance, double rotation_speed, double pan_speed, double zoom_mult) : OgreBites::ApplicationContext("renderer")
+    Renderer(std::string trajectory_path, double camera_distance, double orbit_speed, double zoom_mult) : OgreBites::ApplicationContext("renderer")
     {
       this->trajectory_path = trajectory_path;
       this->cam_dist = camera_distance;
-      this->rot_speed = rotation_speed;
-      this->pan_speed = pan_speed;
+      this->cam_dist_default = camera_distance;
+      this->orbit_speed = orbit_speed;
       this->zoom_mult = zoom_mult;
 
       this->mouse_camera_control = false;

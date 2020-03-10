@@ -2,37 +2,33 @@
 #include "maths_util.hpp"
 
 
+void Renderer::orbit_camera(double dx, double dy, double dz)
+{
+  auto scene_manager = this->getRoot()->getSceneManager("mainSceneManager");
+  Ogre::SceneNode *origin_node = (Ogre::SceneNode *)scene_manager->getRootSceneNode()->getChild("originNode");
+  Ogre::SceneNode *cam_node = (Ogre::SceneNode *)origin_node->getChild("cameraNode");
+  Ogre::Camera *cam = (Ogre::Camera *)cam_node->getAttachedObject("mainCamera");
+
+  origin_node->yaw(Ogre::Degree(-dx * 0.25));
+  origin_node->pitch(Ogre::Degree(-dy * 0.25));
+
+  this->cam_dist += dz;
+  cam->setPosition(origin_node->getPosition());
+  cam->moveRelative({0, 0, this->cam_dist});
+}
+
+
 void Renderer::reset_camera()
 {
   auto scene_manager = this->getRoot()->getSceneManager("mainSceneManager");
-  Ogre::SceneNode *cam_node = (Ogre::SceneNode *)scene_manager->getRootSceneNode()->getChild("cameraNode");
-  cam_node->setPosition(Ogre::Vector3(0.0, 0.0, cam_dist));
-  cam_node->lookAt(Ogre::Vector3(0.0, 0.0, 0.0), Ogre::Node::TS_WORLD);
-  return;
-}
+  Ogre::SceneNode *origin_node = (Ogre::SceneNode *)scene_manager->getRootSceneNode()->getChild("originNode");
+  Ogre::SceneNode *cam_node = (Ogre::SceneNode *)origin_node->getChild("cameraNode");
+  Ogre::Camera *cam = (Ogre::Camera *)cam_node->getAttachedObject("mainCamera");
 
+  origin_node->yaw(Ogre::Degree(0.0));
+  origin_node->pitch(Ogre::Degree(0.0));
 
-void Renderer::rotate_camera(double dyaw, double dpitch, double droll)
-{
-    auto scene_manager = this->getRoot()->getSceneManager("mainSceneManager");
-    Ogre::SceneNode *cam_node = (Ogre::SceneNode *)scene_manager->getRootSceneNode()->getChild("cameraNode");
-    Ogre::Quaternion h = cam_node->getOrientation();
-    cam_node->setOrientation(eul2quat(h.getYaw().valueRadians()+dyaw, h.getPitch().valueRadians()+dpitch, h.getRoll().valueRadians()+droll));
-}
-
-
-void Renderer::move_camera(double dx, double dy, double dz)
-{
-    auto scene_manager = this->getRoot()->getSceneManager("mainSceneManager");
-    Ogre::SceneNode *cam_node = (Ogre::SceneNode *)scene_manager->getRootSceneNode()->getChild("cameraNode");
-    Ogre::Vector3 vec(dx, dy, dz);
-    cam_node->setPosition(vec+cam_node->getPosition());
-}
-
-void Renderer::look_at_origin()
-{
-    auto scene_manager = this->getRoot()->getSceneManager("mainSceneManager");
-    Ogre::SceneNode *cam_node = (Ogre::SceneNode *)scene_manager->getRootSceneNode()->getChild("cameraNode");
-    Ogre::SceneNode *origin_node = (Ogre::SceneNode *)scene_manager->getRootSceneNode()->getChild("originNode");
-    cam_node->lookAt(origin_node->getPosition(), Ogre::Node::TS_WORLD);
+  this->cam_dist = this->cam_dist_default;
+  cam->setPosition(origin_node->getPosition());
+  cam->moveRelative({0, 0, this->cam_dist});
 }

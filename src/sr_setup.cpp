@@ -28,19 +28,19 @@ void Renderer::setup()
   bottom_light->setDiffuseColour(0.5, 0.5, 1.0);
   bottomLightNode->setPosition(0, -100, 0);
 
-  Ogre::SceneNode* camNode = scene_manager->getRootSceneNode()->createChildSceneNode("cameraNode");
   Ogre::SceneNode* origNode = scene_manager->getRootSceneNode()->createChildSceneNode("originNode");
   origNode->setPosition(0.0, 0.0, 0.0);
+  Ogre::SceneNode* camNode = (Ogre::SceneNode*)origNode->createChild("cameraNode");
 
-  Ogre::Camera* cam = scene_manager->createCamera("mainCam");
-  cam->setNearClipDistance(5); // specific to this sample
-  cam->setAutoAspectRatio(true);
-  camNode->attachObject(cam);
-  camNode->setAutoTracking(true, origNode);
-  double c = std::sqrt(3.0);
-  camNode->setPosition(c*this->cam_dist, c*this->cam_dist, c*this->cam_dist);
-
+  Ogre::Camera* cam = scene_manager->createCamera("mainCamera");
   this->getRenderWindow()->addViewport(cam);
+  cam->setNearClipDistance(5);
+  cam->setAutoAspectRatio(true);
+  double c = std::sqrt(3.0);
+  camNode->setPosition(0.0, 0.0, this->cam_dist);
+
+  camNode->attachObject(cam);
+
 
   this->load_trajectory();
 

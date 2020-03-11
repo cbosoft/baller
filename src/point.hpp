@@ -9,7 +9,7 @@ class Point {
     std::vector<Ogre::Vector3> positions;
     std::vector<Ogre::Vector3> velocities;
     std::vector<double> times;
-    double r, L;
+    double r, hL;
     Ogre::SceneNode *node;
     OgreBites::ApplicationContext *ctxt;
 

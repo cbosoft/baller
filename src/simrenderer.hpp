@@ -53,6 +53,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
 
     std::string trajectory_path;
     std::vector<Point> points;
+    double sim_side_length;
 
 
     void setup();
@@ -64,6 +65,8 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     bool mouseReleased(const OgreBites::MouseButtonEvent &evt);
     bool frameEnded(const Ogre::FrameEvent &evt);
     void load_trajectory();
+    void load_trajectory_from_yaml();
+    void load_trajectory_from_tsv();
 
     void rotate_camera(double dyaw, double dpitch, double droll);
     void move_camera(double dx, double dy, double dz);

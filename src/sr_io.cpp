@@ -11,8 +11,9 @@ const std::regex   ID_RE("^        id: (\\d*)$");
 const std::regex MASS_RE("^        mass: (\\d*)$");
 const std::regex DIAM_RE("^        diameter: (\\d*)$");
 const std::regex  POS_RE("^        position: \\[([\\d.\\-e+]*), ([\\d.\\-e+]*), ([\\d.\\-e+]*)\\]$");
+const std::regex  VEL_RE("^        velocity: \\[([\\d.\\-e+]*), ([\\d.\\-e+]*), ([\\d.\\-e+]*)\\]$");
 
-void Renderer::load_trajectory()
+void Renderer::load_trajectory_from_yaml()
 {
   // traj in yaml format
   // list of steps, which are dicts of time, and balls
@@ -43,7 +44,7 @@ void Renderer::load_trajectory()
   //bool reading_ball
   std::cerr << "parsing yaml" << std::endl;
   std::smatch match;
-  float time = 0.0, x = 0.0, y = 0.0, z = 0.0, diameter = 0.0;
+  float time = 0.0, rx = 0.0, ry = 0.0, rz = 0.0, vx = 0.0, vy = 0.0, vz = 0.0, diameter = 0.0;
   int id = 0, step = -1;
 
   while (getline(ifs, line)) {
@@ -86,17 +87,28 @@ corrupt_yaml:
         //std::cerr << "pos?" << line << std::endl;
         if (std::regex_match(line, match, POS_RE)) {
           //std::cerr << match.str(1) << ", " << match.str(2) << ", " << match.str(3) << std::endl;
-          x = atof(match.str(1).c_str());
-          y = atof(match.str(2).c_str());
-          z = atof(match.str(3).c_str());
+          rx = atof(match.str(1).c_str());
+          ry = atof(match.str(2).c_str());
+          rz = atof(match.str(3).c_str());
+          //std::cerr << x << ", " << y << ", " << z << std::endl;
+        }
+
+        // VELOCITY
+        if (!getline(ifs, line)) goto corrupt_yaml;
+        //std::cerr << "pos?" << line << std::endl;
+        if (std::regex_match(line, match, VEL_RE)) {
+          //std::cerr << match.str(1) << ", " << match.str(2) << ", " << match.str(3) << std::endl;
+          vx = atof(match.str(1).c_str());
+          vy = atof(match.str(2).c_str());
+          vz = atof(match.str(3).c_str());
           //std::cerr << x << ", " << y << ", " << z << std::endl;
         }
 
         if (step) {
-          this->points[id-1].add_timepoint({x, y, z}, time);
+          this->points[id-1].add_timepoint({rx, ry, rz}, {vx, vy, vz}, time);
         }
         else {
-          Point p(this, {x, y, z}, diameter/2.0);
+          Point p(this, {rx, ry, rz}, {vx, vy, vz}, diameter/2.0, 10);
           this->points.push_back(p);
         }
 
@@ -124,4 +136,93 @@ corrupt_yaml:
   }
 finished:
   return;
+}
+
+
+void Renderer::load_trajectory_from_tsv()
+{
+  // TODO
+  // simple format:
+  // header line informs number of particles, sim box size
+  // next is headings, can garble
+  // then is time indicator followed by particle data for every particle
+  std::ifstream ifs(this->trajectory_path);
+  std::string line, s;
+  std::stringstream ss;
+
+  std::getline(ifs, line); // version line
+  std::getline(ifs, line); // nL line
+  ss.str(line);
+  std::cerr << line << std::endl;
+
+  int n=0;
+  ss >> s; ss >> n;
+  ss >> s; ss >> this->sim_side_length;
+
+  std::getline(ifs, line); // headings line
+
+  double time = 0.0, x=0.0, y=0.0, z=0.0, diameter=0.0;
+
+  int istep = 0, id = 0;
+  while (std::getline(ifs, line)) {
+    ss.str(line);// t= line
+    std::cerr << "'" << line << "'" << std::endl;
+    ss >> s; // gobble 't='
+    ss >> time;
+
+    std::cerr << "Reading timestep " << time << std::endl;
+
+    for (int i = 0; i < n; i++) {
+
+      if (!std::getline(ifs, line)) {
+        std::cerr << "ERROR: corrupt trajectory." << std::endl;
+        exit(1);
+      }
+
+      ss.str(line);
+      //id	mass	inertia	diameter	roughness	positionx	positiony	positionz	orientationx	orientationy	orientationz	velocityx	velocityy	velocityz	angular_velocityx	angular_velocityy	angular_velocityz	forcex	forcey	forcez	positionx	positiony	positionz	kinetic_energy
+      ss >> id; // id
+      ss >> s; // gobble mass
+      ss >> s; // gobble inertia
+      ss >> diameter; // gobble diameter
+      ss >> s; // gobble roughness
+      ss >> x; ss >> y; ss >> z;
+      Ogre::Vector3 position(x, y, z);
+      ss >> s; ss >> s; ss >> s; // gobble orientation
+      ss >> x; ss >> y; ss >> z;
+      Ogre::Vector3 velocity(x, y, z);
+
+      if (istep) {
+        this->points[id-1].add_timepoint(position, velocity, time);
+      }
+      else {
+        Point p(this, position, velocity, diameter/2.0, this->sim_side_length);
+        this->points.push_back(p);
+      }
+
+    }
+
+    istep++;
+  }
+
+}
+
+void Renderer::load_trajectory()
+{
+  // TODO
+  // load trajectory, guessing file type based on extension
+  size_t last_dot_index = this->trajectory_path.rfind(".");
+  size_t extension_length = this->trajectory_path.size() - last_dot_index - 1;
+  std::string ext = this->trajectory_path.substr(last_dot_index + 1, extension_length);
+
+  if (ext.compare("tsv") == 0) {
+    this->load_trajectory_from_tsv();
+  }
+  else if (ext.compare("yaml") == 0) {
+    this->load_trajectory_from_yaml();
+  }
+  else {
+    std::cerr << "Unknown trajectory format: " << ext << ". Valid formats are .tsv and .yaml" << std::endl;
+    exit(1);
+  }
 }

@@ -3,7 +3,7 @@
 
 int main(int argc, char **argv)
 {
-  std::string trajectory = "traj.yaml";
+  std::string trajectory = "traj.tsv";
   argc --; argv++;
   if (argc > 0) {
     trajectory = argv[0];

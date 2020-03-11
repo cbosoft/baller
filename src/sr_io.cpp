@@ -1,5 +1,6 @@
 #include <fstream>
 #include <regex>
+#include <iomanip>
 
 #include "simrenderer.hpp"
 #include "point.hpp"
@@ -158,19 +159,16 @@ void Renderer::load_trajectory_from_tsv()
   int n=0;
   ss >> s; ss >> n;
   ss >> s; ss >> this->sim_side_length;
+  std::cerr << n << ", " << this->sim_side_length << std::endl;
 
   std::getline(ifs, line); // headings line
 
-  double time = 0.0, x=0.0, y=0.0, z=0.0, diameter=0.0;
+  double time=-1.0, x=-1.0, y=-1.0, z=-1.0, diameter=-1.0;
 
   int istep = 0, id = 0;
   while (std::getline(ifs, line)) {
-    ss.str(line);// t= line
-    std::cerr << "'" << line << "'" << std::endl;
-    ss >> s; // gobble 't='
-    ss >> time;
-
-    std::cerr << "Reading timestep " << time << std::endl;
+    ss = std::stringstream(line);
+    ss >> s >> time;
 
     for (int i = 0; i < n; i++) {
 
@@ -179,17 +177,19 @@ void Renderer::load_trajectory_from_tsv()
         exit(1);
       }
 
-      ss.str(line);
+      ss = std::stringstream(line);
       //id	mass	inertia	diameter	roughness	positionx	positiony	positionz	orientationx	orientationy	orientationz	velocityx	velocityy	velocityz	angular_velocityx	angular_velocityy	angular_velocityz	forcex	forcey	forcez	positionx	positiony	positionz	kinetic_energy
-      ss >> id; // id
-      ss >> s; // gobble mass
-      ss >> s; // gobble inertia
-      ss >> diameter; // gobble diameter
-      ss >> s; // gobble roughness
-      ss >> x; ss >> y; ss >> z;
+      ss 
+        >> id
+        >> s // gobble mass
+        >> s // gobble inertia
+        >> diameter
+        >> s // gobble roughness
+        >> x >> y >> z;
+      std::cerr << s << std::endl;
       Ogre::Vector3 position(x, y, z);
-      ss >> s; ss >> s; ss >> s; // gobble orientation
-      ss >> x; ss >> y; ss >> z;
+      ss >> s >> s >> s; // gobble orientation
+      ss >> x >> y >> z;
       Ogre::Vector3 velocity(x, y, z);
 
       if (istep) {

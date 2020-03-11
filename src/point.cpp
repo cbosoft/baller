@@ -10,13 +10,13 @@ Point::Point(OgreBites::ApplicationContext *ctxt, Ogre::Vector3 position, Ogre::
   this->times.push_back(0.0);
   this->r = radius;
   this->ctxt = ctxt;
-  this->L = sim_side_length;
+  this->hL = sim_side_length/2;
 
   auto scene_manager = this->ctxt->getRoot()->getSceneManager("mainSceneManager");
   Ogre::Entity* ballEntity = scene_manager->createEntity("sphere.mesh"); // default diameter 100 units
   this->node = scene_manager->getRootSceneNode()->createChildSceneNode();
   this->node->attachObject(ballEntity);
-  this->node->setPosition(position);
+  this->node->setPosition(position - (sim_side_length/2));
   this->node->setScale(r/100.0, r/100.0, r/100.0);
   std::cerr << this->node->getPosition() << r/100.0 << std::endl;
 }
@@ -61,7 +61,7 @@ void Point::apply(double t)
   if (tprime > this->get_time(i)) i++;
 
   double dt = tprime - this->get_time(i);
-  Ogre::Vector3 position = this->get_position(i) + (this->get_velocity(i)*dt);
+  Ogre::Vector3 position = this->get_position(i) + (this->get_velocity(i)*dt) - this->hL;
   // for (int i = 0; i < 3 ; i++) {
   //   if (position[i] < 0) position[i] += this->L;
   //   if (position[i] > this->L) position[i] -= this->L;

@@ -33,16 +33,17 @@ void Renderer::setup()
   Ogre::SceneNode* camNode = (Ogre::SceneNode*)origNode->createChild("cameraNode");
 
   Ogre::Camera* cam = scene_manager->createCamera("mainCamera");
+  cam->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
   this->getRenderWindow()->addViewport(cam);
   cam->setNearClipDistance(5);
   cam->setAutoAspectRatio(true);
-  double c = std::sqrt(3.0);
   camNode->setPosition(0.0, 0.0, this->cam_dist);
 
   camNode->attachObject(cam);
 
 
   this->load_trajectory();
+  cam->setOrthoWindow(this->cam_dist, this->cam_dist);
 
 
 

@@ -13,8 +13,7 @@ void Renderer::orbit_camera(double dx, double dy, double dz)
   origin_node->pitch(Ogre::Degree(-dy * 0.25));
 
   this->cam_dist += dz;
-  cam->setPosition(origin_node->getPosition());
-  cam->moveRelative({0, 0, this->cam_dist});
+  cam->setOrthoWindow(this->cam_dist, this->cam_dist);
 }
 
 
@@ -28,7 +27,6 @@ void Renderer::reset_camera()
   origin_node->yaw(Ogre::Degree(0.0));
   origin_node->pitch(Ogre::Degree(0.0));
 
-  this->cam_dist = this->cam_dist_default;
-  cam->setPosition(origin_node->getPosition());
-  cam->moveRelative({0, 0, this->cam_dist});
+  this->cam_dist += dz;
+  cam->setOrthoWindow(this->cam_dist, this->cam_dist);
 }

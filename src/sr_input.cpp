@@ -9,8 +9,11 @@ bool Renderer::keyPressed(const OgreBites::KeyboardEvent &evt)
       break;
 
     case '=':
-    case 'r':
       this->reset_camera();
+      break;
+
+    case 'r':
+      this->repeat = !this->repeat;
       break;
 
     case 'w': this->keys_down |= DK_U; break;

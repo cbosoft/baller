@@ -1,144 +1,8 @@
 #include <fstream>
-#include <regex>
 #include <iomanip>
 
 #include "simrenderer.hpp"
 #include "point.hpp"
-
-const std::regex STEP_RE("^ - step:$");
-const std::regex TIME_RE("^   time: ([\\d.\\-e+]*)$");
-const std::regex DASH_RE("^      - ?$");
-const std::regex   ID_RE("^        id: (\\d*)$");
-const std::regex MASS_RE("^        mass: (\\d*)$");
-const std::regex DIAM_RE("^        diameter: (\\d*)$");
-const std::regex  POS_RE("^        position: \\[([\\d.\\-e+]*), ([\\d.\\-e+]*), ([\\d.\\-e+]*)\\]$");
-const std::regex  VEL_RE("^        velocity: \\[([\\d.\\-e+]*), ([\\d.\\-e+]*), ([\\d.\\-e+]*)\\]$");
-
-void Renderer::load_trajectory_from_yaml()
-{
-  // traj in yaml format
-  // list of steps, which are dicts of time, and balls
-  // balls is list of balls
-  /*
-  
-  |---
-  | - step:
-  |   time: 0
-  |   balls:
-  |      - 
-  |        id: 1
-  |        mass: 1
-  |        diameter: 1
-  |        position: []
-          ...
-  */
-
-  std::ifstream ifs(this->trajectory_path);
-  std::string line;
-
-  // (id-1) is index in this->points
-
-  // gobble first line '---'
-  std::getline(ifs, line);
-
-  //bool reading_step = false;
-  //bool reading_ball
-  std::cerr << "parsing yaml" << std::endl;
-  std::smatch match;
-  float time = 0.0, rx = 0.0, ry = 0.0, rz = 0.0, vx = 0.0, vy = 0.0, vz = 0.0, diameter = 0.0;
-  int id = 0, step = -1;
-
-  while (getline(ifs, line)) {
-    std::cerr << line << std::endl;
-    if (std::regex_match(line, match, STEP_RE)) {
-step_read:
-      step++;
-      // TIME
-      if (!getline(ifs, line)) goto corrupt_yaml;
-      if (std::regex_match(line, match, TIME_RE)) {
-        time = atof(match.str(1).c_str());
-        std::cerr << "reading timestep: " << time << std::endl; 
-      }
-      else {
-corrupt_yaml:
-        std::cerr << "corrupt yaml: " << line << std::endl;
-        exit(1);
-      }
-
-      if (!getline(ifs, line)) goto corrupt_yaml;
-      if (!getline(ifs, line)) goto corrupt_yaml;
-
-      // BALLS
-      while (true) {
-        // ID
-        if (!getline(ifs, line)) goto corrupt_yaml;
-        if (std::regex_match(line, match, ID_RE)) {
-          id = atoi(match.str(1).c_str());
-        }
-
-        if (!getline(ifs, line)) goto corrupt_yaml; // gobble mass
-
-        if (!getline(ifs, line)) goto corrupt_yaml;
-        if (std::regex_match(line, match, DIAM_RE)) {
-          diameter = atof(match.str(1).c_str());
-        }
-
-        // POSITION
-        if (!getline(ifs, line)) goto corrupt_yaml;
-        //std::cerr << "pos?" << line << std::endl;
-        if (std::regex_match(line, match, POS_RE)) {
-          //std::cerr << match.str(1) << ", " << match.str(2) << ", " << match.str(3) << std::endl;
-          rx = atof(match.str(1).c_str());
-          ry = atof(match.str(2).c_str());
-          rz = atof(match.str(3).c_str());
-          //std::cerr << x << ", " << y << ", " << z << std::endl;
-        }
-
-        // VELOCITY
-        if (!getline(ifs, line)) goto corrupt_yaml;
-        //std::cerr << "pos?" << line << std::endl;
-        if (std::regex_match(line, match, VEL_RE)) {
-          //std::cerr << match.str(1) << ", " << match.str(2) << ", " << match.str(3) << std::endl;
-          vx = atof(match.str(1).c_str());
-          vy = atof(match.str(2).c_str());
-          vz = atof(match.str(3).c_str());
-          //std::cerr << x << ", " << y << ", " << z << std::endl;
-        }
-
-        if (step) {
-          this->points[id-1].add_timepoint({rx, ry, rz}, {vx, vy, vz});
-        }
-        else {
-          Point p(this, {rx, ry, rz}, {vx, vy, vz}, diameter/2.0, id);
-          this->points.push_back(p);
-        }
-
-        while (true) {
-
-          if (!getline(ifs, line)) {
-            goto finished;
-          }
-
-          if (std::regex_match(line, match, DASH_RE)) {
-            break;
-          }
-          else if (std::regex_match(line, match, STEP_RE)) {
-            //std::cout << "step?" << line << std::endl;
-            goto step_read;
-          }
-        }
-
-      }
-
-    }
-    else {
-      exit(1);
-    }
-  }
-finished:
-  return;
-}
-
 
 void Renderer::load_trajectory_from_tsv()
 {
@@ -210,7 +74,6 @@ void Renderer::load_trajectory_from_tsv()
 
 void Renderer::load_trajectory()
 {
-  // TODO
   // load trajectory, guessing file type based on extension
   size_t last_dot_index = this->trajectory_path.rfind(".");
   size_t extension_length = this->trajectory_path.size() - last_dot_index - 1;
@@ -219,11 +82,8 @@ void Renderer::load_trajectory()
   if (ext.compare("tsv") == 0) {
     this->load_trajectory_from_tsv();
   }
-  else if (ext.compare("yaml") == 0) {
-    this->load_trajectory_from_yaml();
-  }
   else {
-    std::cerr << "Unknown trajectory format: " << ext << ". Valid formats are .tsv and .yaml" << std::endl;
+    std::cerr << "Unknown trajectory format: " << ext << ". Valid format is .tsv." << std::endl;
     exit(1);
   }
 }

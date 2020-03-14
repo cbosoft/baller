@@ -69,7 +69,6 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
     bool mouseReleased(const OgreBites::MouseButtonEvent &evt);
     bool frameEnded(const Ogre::FrameEvent &evt);
     void load_trajectory();
-    void load_trajectory_from_yaml();
     void load_trajectory_from_tsv();
 
     void orbit_camera(double dx, double dy, double dz);

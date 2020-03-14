@@ -36,12 +36,15 @@ enum DIR_KEYS {
 class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputListener {
   private:
     bool mouse_camera_control;
+    bool repeat;
     double cam_dist;
     double cam_dist_default;
     double orbit_speed;
     double zoom_mult;
+    double speed_mult;
     double time_mult;
     double time;
+    std::vector<double> times;
 
     int keys_down;
 
@@ -53,6 +56,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
 
     std::string trajectory_path;
     std::vector<Point> points;
+    std::vector<std::pair<int, int>> interacting_ids;
     double sim_side_length;
 
 
@@ -70,15 +74,17 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
 
     void orbit_camera(double dx, double dy, double dz);
     void reset_camera();
+    void set_repeat(bool v);
 
   public:
-    Renderer(std::string trajectory_path, double camera_distance, double orbit_speed, double zoom_mult) : OgreBites::ApplicationContext("renderer")
+    Renderer(std::string trajectory_path, double camera_distance, double orbit_speed, double zoom_mult, double speed_mult) : OgreBites::ApplicationContext("renderer")
     {
       this->trajectory_path = trajectory_path;
       this->cam_dist = camera_distance;
       this->cam_dist_default = camera_distance;
       this->orbit_speed = orbit_speed;
       this->zoom_mult = zoom_mult;
+      this->speed_mult = speed_mult;
 
       this->mouse_camera_control = false;
       this->keys_down = 0;
@@ -86,6 +92,7 @@ class Renderer : public OgreBites::ApplicationContext, public OgreBites::InputLi
       this->fps_history_max_len = 100;
       this->overlay_frames_skip = 10;
       this->time_mult = 0.1;
+      this->repeat = false;
     };
 
     void init_overlay() {

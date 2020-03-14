@@ -106,10 +106,10 @@ corrupt_yaml:
         }
 
         if (step) {
-          this->points[id-1].add_timepoint({rx, ry, rz}, {vx, vy, vz}, time);
+          this->points[id-1].add_timepoint({rx, ry, rz}, {vx, vy, vz});
         }
         else {
-          Point p(this, {rx, ry, rz}, {vx, vy, vz}, diameter/2.0, 10);
+          Point p(this, {rx, ry, rz}, {vx, vy, vz}, diameter/2.0, id);
           this->points.push_back(p);
         }
 
@@ -156,7 +156,7 @@ void Renderer::load_trajectory_from_tsv()
   ss.str(line);
   std::cerr << line << std::endl;
 
-  int n=0;
+  int n=0, aid=-1, bid=-1;
   ss >> s; ss >> n;
   ss >> s; ss >> this->sim_side_length;
   std::cerr << n << ", " << this->sim_side_length << std::endl;
@@ -168,7 +168,9 @@ void Renderer::load_trajectory_from_tsv()
   int istep = 0, id = 0;
   while (std::getline(ifs, line)) {
     ss = std::stringstream(line);
-    ss >> s >> time;
+    ss >> s >> time >> aid >> s >> bid;
+    this->interacting_ids.push_back(std::make_pair(aid, bid));
+    this->times.push_back(time);
 
     for (int i = 0; i < n; i++) {
 
@@ -186,17 +188,16 @@ void Renderer::load_trajectory_from_tsv()
         >> diameter
         >> s // gobble roughness
         >> x >> y >> z;
-      std::cerr << s << std::endl;
       Ogre::Vector3 position(x, y, z);
       ss >> s >> s >> s; // gobble orientation
       ss >> x >> y >> z;
       Ogre::Vector3 velocity(x, y, z);
 
       if (istep) {
-        this->points[id-1].add_timepoint(position, velocity, time);
+        this->points[id-1].add_timepoint(position, velocity);
       }
       else {
-        Point p(this, position, velocity, diameter/2.0, this->sim_side_length);
+        Point p(this, position, velocity, diameter/2.0, id);
         this->points.push_back(p);
       }
 

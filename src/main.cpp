@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
   try
   {
-  	Renderer app(trajectory, 10, 10.0, 1.0);
+  	Renderer app(trajectory, 150.0, 10.0, 1.0, 10.0);
     app.initApp();
     app.getRoot()->startRendering();
     app.closeApp();

@@ -3,28 +3,26 @@
 #include "point.hpp"
 
 
-Point::Point(OgreBites::ApplicationContext *ctxt, Ogre::Vector3 position, Ogre::Vector3 velocity, double radius, double sim_side_length)
+Point::Point(OgreBites::ApplicationContext *ctxt, Ogre::Vector3 position, Ogre::Vector3 velocity, double radius, int id)
 {
   this->positions.push_back(position);
   this->velocities.push_back(velocity);
-  this->times.push_back(0.0);
   this->r = radius;
   this->ctxt = ctxt;
-  this->hL = sim_side_length/2;
+  this->id = id;
 
   auto scene_manager = this->ctxt->getRoot()->getSceneManager("mainSceneManager");
-  Ogre::Entity* ballEntity = scene_manager->createEntity("sphere.mesh"); // default diameter 100 units
+  this->entity = scene_manager->createEntity("sphere.mesh"); // default diameter 100 units
+  this->entity->getSubEntity(0)->setMaterialName("normalMaterial");
   this->node = scene_manager->getRootSceneNode()->createChildSceneNode();
-  this->node->attachObject(ballEntity);
-  this->node->setPosition(position - (sim_side_length/2));
+  this->node->attachObject(this->entity);
   this->node->setScale(r/100.0, r/100.0, r/100.0);
 }
 
-void Point::add_timepoint(Ogre::Vector3 position, Ogre::Vector3 velocity, double time)
+void Point::add_timepoint(Ogre::Vector3 position, Ogre::Vector3 velocity)
 {
   this->positions.push_back(position);
   this->velocities.push_back(velocity);
-  this->times.push_back(time);
 }
 
 Ogre::Vector3 Point::get_velocity(int timestep) const
@@ -37,35 +35,27 @@ Ogre::Vector3 Point::get_position(int timestep) const
   return this->positions[timestep];
 }
 
-double Point::get_time(int timestep) const
-{
-  return this->times[timestep];
-}
-
 Ogre::SceneNode *Point::get_node() const
 {
   return this->node;
 }
 
-void Point::apply(double t)
+void Point::set_position(Ogre::Vector3 pos)
 {
-  //this->track->apply(Ogre::TimeIndex(t));
-  static unsigned int i = 1;
-  static double toff = 0.0;
-  if (i >= this->positions.size()) {
-    i = 1; // restart, or end? TODO
-    toff += this->times.back();
+  this->node->setPosition(pos);
+}
+
+void Point::set_interacting(bool v)
+{
+  if (v) {
+    this->entity->getSubEntity(0)->setMaterialName("interactingMaterial");
   }
-  double tprime = t-toff;
-  if (tprime > this->get_time(i)) i++;
+  else {
+    this->entity->getSubEntity(0)->setMaterialName("normalMaterial");
+  }
+}
 
-  double dt = tprime - this->get_time(i);
-  Ogre::Vector3 position = this->get_position(i) + (this->get_velocity(i)*dt) - this->hL;
-  // for (int i = 0; i < 3 ; i++) {
-  //   if (position[i] < 0) position[i] += this->L;
-  //   if (position[i] > this->L) position[i] -= this->L;
-  // }
-
-  this->node->setPosition(position);
-
+int Point::get_id() const
+{
+  return this->id;
 }

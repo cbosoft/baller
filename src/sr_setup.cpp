@@ -41,6 +41,13 @@ void Renderer::setup()
 
   camNode->attachObject(cam);
 
+  auto material_manager = Ogre::MaterialManager::getSingletonPtr();
+  auto normal_material = material_manager->create("normalMaterial", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  normal_material->setDiffuse(0.3, 0.3, 0.3, 1.0);
+  auto interacting_material = material_manager->create("interactingMaterial", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  interacting_material->setDiffuse(1.0, 1.0, 0.0, 1.0);
+  
+
 
   this->load_trajectory();
   cam->setOrthoWindow(this->cam_dist, this->cam_dist);

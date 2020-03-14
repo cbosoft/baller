@@ -27,6 +27,6 @@ void Renderer::reset_camera()
   origin_node->yaw(Ogre::Degree(0.0));
   origin_node->pitch(Ogre::Degree(0.0));
 
-  this->cam_dist += dz;
+  this->cam_dist = this->cam_dist_default;
   cam->setOrthoWindow(this->cam_dist, this->cam_dist);
 }
